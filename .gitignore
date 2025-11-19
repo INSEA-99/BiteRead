@@ -1,0 +1,40 @@
+# -----------------------
+# Node / Frontend
+# -----------------------
+node_modules/
+npm-debug.log
+yarn-error.log
+.expo/
+.expo-shared/
+web-build/
+
+# -----------------------
+# Python / LangChain 서버
+# -----------------------
+langchain-server/venv/
+*.pyc
+__pycache__/
+.env
+
+# -----------------------
+# Java Backend
+# -----------------------
+java-backend/build/
+java-backend/.gradle/
+java-backend/out/
+*.class
+
+# -----------------------
+# OS / IDE
+# -----------------------
+.DS_Store
+Thumbs.db
+.vscode/
+*.swp
+
+# -----------------------
+# 클로드 관련
+# -----------------------
+# 로컬 클로드 데이터 / 캐시 / 환경파일
+.claude/
+.claude-cache/
