@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  langchain-server:
+    build:
+      context: ./langchain-server
+      dockerfile: Dockerfile
+    container_name: biteread-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mount code for development (hot reload)
+      - ./langchain-server:/app
+      # Persist database
+      - ./langchain-server/data:/app/data
+    environment:
+      # Environment variables from .env file
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    env_file:
+      - ./langchain-server/.env
+    restart: unless-stopped
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+# Optional: uncomment for production build without hot reload
+# services:
+#   langchain-server:
+#     build:
+#       context: ./langchain-server
+#     ports:
+#       - "8000:8000"
+#     volumes:
+#       - ./langchain-server/data:/app/data
+#     env_file:
+#       - ./langchain-server/.env.production
+#     restart: always
