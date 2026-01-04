@@ -8,6 +8,7 @@ class TranslationCheckRequest(BaseModel):
 
 
 class TranslationCheckResponse(BaseModel):
+    result: str  # 'perfect', 'good', or 'incorrect'
     is_correct: bool
     feedback: Optional[str] = None
     next_sentence_id: Optional[int] = None

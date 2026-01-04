@@ -44,6 +44,7 @@ def check_translation(
 
         # Prepare response
         response = TranslationCheckResponse(
+            result=feedback_result.result,
             is_correct=feedback_result.is_correct,
             feedback=feedback_result.feedback,
             original_sentence=sentence.text,

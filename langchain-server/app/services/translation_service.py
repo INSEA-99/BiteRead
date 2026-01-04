@@ -8,10 +8,11 @@ from typing import Optional
 
 class TranslationFeedback(BaseModel):
     """Structure for LLM feedback response"""
-    is_correct: bool = Field(description="Whether the translation is correct")
+    result: str = Field(description="Evaluation result: 'perfect', 'good', or 'incorrect'")
     feedback: Optional[str] = Field(
-        description="Short hint if translation is incorrect (1-2 sentences max)"
+        description="Short feedback message (1-2 sentences max)"
     )
+    is_correct: bool = Field(description="Whether the translation is acceptable (perfect or good)")
 
 
 class TranslationService:
@@ -33,14 +34,44 @@ class TranslationService:
         self.prompt = ChatPromptTemplate.from_messages([
             ("system", """You are an English teacher evaluating Korean translations of English sentences.
 
-Your task:
-1. Check if the student's Korean translation captures the meaning of the original English sentence
-2. If correct: respond with is_correct=true, feedback=null
-3. If incorrect or incomplete: respond with is_correct=false and provide a SHORT hint (1-2 sentences)
+Evaluate the translation into one of three levels:
+1. **perfect**: Translation conveys the correct meaning with proper vocabulary and grammar
+   - Ignore spacing errors, small typos, and formal/informal variations
+   - Focus ONLY on whether the meaning is accurately conveyed
+2. **good**: Translation conveys the general idea but has noticeable vocabulary or grammar issues
+   - Use this when word choice is awkward or grammar is unclear
+3. **incorrect**: Translation is wrong or misses key meaning
+   - Use this only when the meaning is significantly different or completely wrong
 
-Hints should:
+CRITICAL RULES - These errors should NOT prevent 'perfect' rating:
+1. Spacing errors: "매트위에" vs "매트 위에" → Both are PERFECT
+2. Formal/informal: "앉아있다" vs "앉아있습니다" → Both are PERFECT
+3. Small typos: If meaning is clear despite typo → PERFECT
+4. Minor particle variations: If meaning unchanged → PERFECT
+
+Focus ONLY on:
+- Does the translation accurately convey the meaning?
+- Are the key vocabulary words correct?
+- Is the basic grammar structure understandable?
+
+If YES to all three → Mark as 'perfect', regardless of spacing/typos/formality
+
+Response format:
+- result: 'perfect', 'good', or 'incorrect'
+- is_correct: true for 'perfect' or 'good', false for 'incorrect'
+- feedback:
+  - For 'perfect': Short encouraging message ONLY (e.g., "완벽합니다!" or "정확합니다!")
+    * Do NOT mention spacing, typos, or formality issues
+    * Keep it simple and positive
+  - For 'good': Brief note on what could be improved (1-2 sentences)
+    * Only mention significant vocabulary or grammar issues
+  - For 'incorrect': SHORT hint pointing to the issue (1-2 sentences, do NOT give the answer)
+
+Feedback should:
+- ALWAYS be in formal Korean (존댓말) - use "~습니다/~세요" endings
 - NOT give the answer directly
-- Point to what to reconsider (grammar, vocabulary, tense, word choice)
+- For 'perfect': NEVER mention spacing, typos, or formality - just praise
+- For 'good': Only point to actual vocabulary/grammar issues, NOT spacing/typos
 - Be encouraging and educational
 
 {format_instructions}"""),
