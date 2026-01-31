@@ -17,6 +17,7 @@ __pycache__/
 .env
 *.db
 *.json
+!vercel.json
 
 # -----------------------
 # Java Backend
